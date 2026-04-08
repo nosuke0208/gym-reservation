@@ -3,7 +3,12 @@ import os
 import sys
 
 os.environ.setdefault("SUPABASE_URL", "https://test.supabase.co")
-os.environ.setdefault("SUPABASE_KEY", "test-service-key")
+os.environ.setdefault(
+    "SUPABASE_KEY",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+    ".eyJyb2xlIjoic2VydmljZV9yb2xlIn0"
+    ".test-signature-placeholder",
+)
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
