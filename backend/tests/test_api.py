@@ -52,3 +52,38 @@ def test_get_reservations_returns_list(api_client):
     data = resp.json()
     assert len(data) == 1
     assert data[0]["username"] == "田中"
+
+
+from postgrest.exceptions import APIError
+
+
+def test_post_reservation_success(api_client):
+    client, mock_sb = api_client
+    mock_sb.table.return_value.insert.return_value.execute.return_value.data = [
+        {"id": "uuid-2", "machine": "bench_press",
+         "date": "2026-04-08", "hour": 14, "username": "佐藤"}
+    ]
+
+    resp = client.post("/reservations", json={
+        "machine": "bench_press",
+        "date": "2026-04-08",
+        "hour": 14,
+        "username": "佐藤"
+    })
+    assert resp.status_code == 201
+    assert resp.json()["username"] == "佐藤"
+
+
+def test_post_reservation_conflict(api_client):
+    client, mock_sb = api_client
+    api_error = APIError({"code": "23505", "message": "duplicate key"})
+    mock_sb.table.return_value.insert.return_value.execute.side_effect = api_error
+
+    resp = client.post("/reservations", json={
+        "machine": "bench_press",
+        "date": "2026-04-08",
+        "hour": 14,
+        "username": "鈴木"
+    })
+    assert resp.status_code == 409
+    assert "予約されています" in resp.json()["detail"]
