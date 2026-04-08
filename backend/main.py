@@ -36,6 +36,23 @@ def create_reservation(body: ReservationCreate):
         raise HTTPException(status_code=500, detail="サーバーエラー")
 
 
+@app.delete("/reservations/{reservation_id}")
+def cancel_reservation(reservation_id: str, username: str = Query(...)):
+    result = (
+        supabase.table("reservations")
+        .select("*")
+        .eq("id", reservation_id)
+        .limit(1)
+        .execute()
+    )
+    if not result.data:
+        raise HTTPException(status_code=404, detail="予約が見つかりません")
+    if result.data[0]["username"] != username:
+        raise HTTPException(status_code=403, detail="ユーザー名が一致しません")
+    supabase.table("reservations").delete().eq("id", reservation_id).execute()
+    return {"message": "キャンセルしました"}
+
+
 @app.get("/reservations", response_model=list[ReservationResponse])
 def get_reservations(
     machine: str = Query(...),

@@ -87,3 +87,38 @@ def test_post_reservation_conflict(api_client):
     })
     assert resp.status_code == 409
     assert "予約されています" in resp.json()["detail"]
+
+
+def test_delete_reservation_success(api_client):
+    client, mock_sb = api_client
+    mock_sb.table.return_value.select.return_value \
+        .eq.return_value.limit.return_value.execute.return_value.data = [
+            {"id": "uuid-3", "machine": "bench_press",
+             "date": "2026-04-08", "hour": 10, "username": "田中"}
+        ]
+    mock_sb.table.return_value.delete.return_value \
+        .eq.return_value.execute.return_value.data = []
+
+    resp = client.delete("/reservations/uuid-3?username=田中")
+    assert resp.status_code == 200
+
+
+def test_delete_reservation_wrong_username(api_client):
+    client, mock_sb = api_client
+    mock_sb.table.return_value.select.return_value \
+        .eq.return_value.limit.return_value.execute.return_value.data = [
+            {"id": "uuid-3", "machine": "bench_press",
+             "date": "2026-04-08", "hour": 10, "username": "田中"}
+        ]
+
+    resp = client.delete("/reservations/uuid-3?username=別人")
+    assert resp.status_code == 403
+
+
+def test_delete_reservation_not_found(api_client):
+    client, mock_sb = api_client
+    mock_sb.table.return_value.select.return_value \
+        .eq.return_value.limit.return_value.execute.return_value.data = []
+
+    resp = client.delete("/reservations/nonexistent?username=田中")
+    assert resp.status_code == 404
