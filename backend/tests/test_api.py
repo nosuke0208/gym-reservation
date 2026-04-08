@@ -36,3 +36,19 @@ def test_reservation_create_username_too_long():
             hour=10,
             username="a" * 21
         )
+
+
+def test_get_reservations_returns_list(api_client):
+    client, mock_sb = api_client
+    mock_sb.table.return_value.select.return_value \
+        .eq.return_value.gte.return_value.lte.return_value \
+        .execute.return_value.data = [
+            {"id": "uuid-1", "machine": "bench_press",
+             "date": "2026-04-08", "hour": 10, "username": "田中"}
+        ]
+
+    resp = client.get("/reservations?machine=bench_press&start=2026-04-07&end=2026-04-13")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) == 1
+    assert data[0]["username"] == "田中"
