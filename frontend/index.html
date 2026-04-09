@@ -83,13 +83,7 @@
 </head>
 <body>
   <div class="app">
-    <header>ジム予約システム</header>
-
-    <div class="tabs">
-      <div class="tab active" data-machine="bench_press">ベンチプレス</div>
-      <div class="tab" data-machine="squat_rack">スクワット</div>
-      <div class="tab" data-machine="deadlift">デッドリフト</div>
-    </div>
+    <header>ベンチプレス予約システム</header>
 
     <div class="week-nav">
       <button id="prevWeek">&#8592;</button>
@@ -287,15 +281,6 @@ async function loadAndRender() {
   renderTimeSlots();
 }
 
-// ===== イベント：タブ =====
-document.querySelectorAll(".tab").forEach(tab => {
-  tab.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-    currentMachine = tab.dataset.machine;
-    loadAndRender();
-  });
-});
 
 // ===== イベント：週ナビ =====
 document.getElementById("prevWeek").addEventListener("click", () => {
