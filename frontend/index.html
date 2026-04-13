@@ -83,7 +83,7 @@
 </head>
 <body>
   <div class="app">
-    <header>ベンチプレス予約システム</header>
+    <header>ベンチプレス利用予定</header>
 
     <div class="week-nav">
       <button id="prevWeek">&#8592;</button>
@@ -145,6 +145,12 @@ function addDays(d, n) {
 function formatLabel(d) {
   const days = ["日","月","火","水","木","金","土"];
   return { dow: days[d.getDay()], day: d.getDate() };
+}
+
+function formatTime(h) {
+  const hour = Math.floor(h);
+  const min = (h % 1 >= 0.4) ? "30" : "00";
+  return `${hour}:${min}`;
 }
 
 function hashColor(username) {
@@ -229,16 +235,17 @@ function renderTimeSlots() {
   container.innerHTML = "";
   const dayReservations = reservations.filter(r => r.date === selectedDate);
 
-  for (let h = 10; h <= 21; h++) {
+  for (let i = 20; i <= 43; i++) {
+    const h = i / 2;
     const row = document.createElement("div");
     row.className = "slot-row";
 
     const timeEl = document.createElement("span");
     timeEl.className = "slot-time";
-    timeEl.textContent = `${h}:00`;
+    timeEl.textContent = formatTime(h);
     row.appendChild(timeEl);
 
-    const existing = dayReservations.find(r => r.hour === h);
+    const existing = dayReservations.find(r => Math.abs(r.hour - h) < 0.01);
     if (existing) {
       const badge = document.createElement("span");
       badge.className = "slot-badge";
@@ -304,7 +311,7 @@ document.getElementById("nextWeek").addEventListener("click", () => {
 function openReservationModal(hour) {
   pendingHour = hour;
   document.getElementById("modalTitle").textContent =
-    `${selectedDate} ${hour}:00〜${hour+1}:00 を予約`;
+    `${selectedDate} ${formatTime(hour)}〜${formatTime(hour+0.5)} を予約`;
   document.getElementById("usernameInput").value = "";
   document.getElementById("modalError").textContent = "";
   document.getElementById("reservationModal").classList.add("open");

@@ -5,7 +5,7 @@ CREATE TABLE reservations (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     machine     TEXT NOT NULL CHECK (machine IN ('bench_press', 'squat_rack', 'deadlift')),
     date        DATE NOT NULL,
-    hour        SMALLINT NOT NULL CHECK (hour >= 10 AND hour <= 21),
+    hour        NUMERIC(3,1) NOT NULL CHECK (hour >= 10 AND hour <= 21.5 AND hour * 2 = FLOOR(hour * 2)),
     username    TEXT NOT NULL CHECK (char_length(username) BETWEEN 1 AND 20),
     created_at  TIMESTAMPTZ DEFAULT now(),
 
